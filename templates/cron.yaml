@@ -51,8 +51,6 @@ spec:
               - |
                 AWS_ACCOUNT="$(printf $AWS_ECR_REGISTRY | sed 's/\(^[0-9]\+\).*/\1/')"
                 AWS_REGION="$(printf $AWS_ECR_REGISTRY | sed 's/.*\.\([^\.]\+\)\.amazonaws\.com.*/\1/')"
-                echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
-                echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
                 echo "AWS_ACCOUNT=$AWS_ACCOUNT"
                 echo "AWS_REGION=$AWS_REGION"
                 DOCKER_REGISTRY_SERVER=https://${AWS_ECR_REGISTRY}
@@ -61,7 +59,6 @@ spec:
 
                 echo "DOCKER_REGISTRY_SERVER=$DOCKER_REGISTRY_SERVER"
                 echo "DOCKER_USER=$DOCKER_USER"
-                echo "DOCKER_PASSWORD=$DOCKER_PASSWORD"
 
                 kubectl delete secret --namespace $TARGET_NAMESPACE $TARGET_SECRET || true
                 kubectl create secret --namespace $TARGET_NAMESPACE docker-registry $TARGET_SECRET \
@@ -70,5 +67,5 @@ spec:
                 --docker-password=$DOCKER_PASSWORD \
                 --docker-email=no@email.local
 
-                kubectl patch serviceaccount default -p "{\"imagePullSecrets\":[{\"name\":\"$TARGET_SECRET\"}]}"
+                kubectl patch serviceaccount default --namespace "$TARGET_NAMESPACE" -p "{\"imagePullSecrets\":[{\"name\":\"$TARGET_SECRET\"}]}"
 {{- end }}

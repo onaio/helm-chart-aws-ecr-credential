@@ -84,3 +84,15 @@ spec:
         - name: node
           image: node:latest
 ```
+
+## Refresh permissions
+
+Refresh jobs receive a Role and RoleBinding in `targetNamespace`, allowing secret
+creation, reads and deletion of `targetSecret`, and reads and patches of the
+`default` service account. Secret creation cannot be restricted by name. The
+binding references the refresh account in the credentials namespace.
+
+Before upgrading from 1.4.2, provide namespace permissions for every account that
+depends on the old ClusterRoleBinding. Helm may remove it when upgrading its
+owning release. Recreate the initial Job because its pod template is immutable.
+Remove any remaining legacy binding after all dependent accounts have migrated.
